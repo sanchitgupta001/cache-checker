@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 
+const URL_HAS_PROTOCOL_REGEX = /^https?:\/\//i;
 
 /*
  *This function loads the webpage first time so i can be cached 
@@ -21,7 +22,7 @@ first_load = async (URL) => {
     await page.goto(URL);
     browser.close();
     return true;
-}
+};
 
 /*
  * Main Method
@@ -31,8 +32,11 @@ first_load = async (URL) => {
  */
 is_cached = async (URL) => {
     console.log("Cache Checker is running on "+URL);
-    console.log("Please wait.....")
-    await first_load(URL); //<-- This function loads the webpage first time so i can be cached 
+    console.log("Please wait.....");
+    
+		const updatedURL = URL.match(URL_HAS_PROTOCOL_REGEX) ? URL : `https://${URL}`;
+    
+    await first_load(updatedURL); //<-- This function loads the webpage first time so i can be cached 
 
     //Create browser instance
     const browser = await puppeteer.launch({
@@ -104,7 +108,7 @@ is_cached = async (URL) => {
     });
 
 
-    await page.goto(URL);
+    await page.goto(updatedURL);
     await page.waitFor(5000);
 
     //Print the Results
@@ -112,7 +116,7 @@ is_cached = async (URL) => {
     console.log(is_leverage_cache);
     browser.close();
     console.log('Completed!');
-}
+};
 
 
 //is_cached('https://github.com');
